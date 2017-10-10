@@ -1,0 +1,29 @@
+{
+    "name": "ruogoo/laravel-scout-opensearch",
+    "description": "Aliyun OpenSearch for Laravel.",
+    "type": "library",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "HyanCat",
+            "email": "hyancat@live.cn"
+        }
+    ],
+    "require": {
+        "php": ">=7.0",
+        "illuminate/support": "~5.4",
+        "laravel/scout": "*"
+    },
+    "autoload": {
+        "psr-4": {
+            "Ruogoo\\OpenSearch\\": "src/"
+        }
+    },
+    "extra": {
+        "laravel": {
+            "providers": [
+                "Ruogoo\\OpenSearch\\OpenSearchServiceProvider"
+            ]
+        }
+    }
+}
