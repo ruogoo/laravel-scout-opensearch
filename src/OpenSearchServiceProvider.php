@@ -14,8 +14,6 @@ use Laravel\Scout\EngineManager;
 
 class OpenSearchServiceProvider extends ServiceProvider
 {
-    protected $defer = true;
-
     public function register()
     {
         $this->app[EngineManager::class]->extend('opensearch', function ($app) {
