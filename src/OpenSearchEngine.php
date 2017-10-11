@@ -1,6 +1,6 @@
 <?php
 /**
- * This file is part of ruogu.
+ * This file is part of ruogoo.
  *
  * Created by HyanCat.
  *
@@ -107,7 +107,7 @@ class OpenSearchEngine extends Engine
         if ($models->count() === 0) {
             return;
         }
-        $appName   = $models->first()->searchableAs();
+        $appName   = $models->first()->openSearchAppName();
         $tableName = $models->first()->getTable();
 
         $docs = $models->map(function ($model) use ($cmd) {
@@ -131,14 +131,14 @@ class OpenSearchEngine extends Engine
         $params = new SearchParamsBuilder();
         $params->setStart($from);
         $params->setHits($count);
-        $params->setAppName($builder->model->searchableAs());
+        $params->setAppName($builder->model->openSearchAppName());
         if ($builder->index) {
             $params->setQuery("$builder->index:'$builder->query'");
         } else {
             $params->setQuery("'$builder->query'");
         }
-        $params->setFormat("fulljson");
-        $params->addSort('RANK', SearchParamsBuilder::SORT_DECREASE);
+        $params->setFormat('fullJson');
+        $params->addSort($builder->model->sortField(), SearchParamsBuilder::SORT_DECREASE);
 
         return $this->searchClient->execute($params->build());
     }
