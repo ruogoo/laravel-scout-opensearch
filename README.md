@@ -6,7 +6,7 @@ Laravel Scout 的 阿里云 Open Search 驱动。
 
 建议使用 composer 方式安装此包
 
-    composer require ruogoo/laravel-scout-opensearch
+    composer require ruogoo/laravel-scout-opensearch:dev-master
 
 ## Usage
 
