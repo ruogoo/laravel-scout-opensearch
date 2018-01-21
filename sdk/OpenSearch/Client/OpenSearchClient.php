@@ -211,7 +211,7 @@ class OpenSearchClient extends OpenSearch {
             $query = !empty($params) ? http_build_query($params, null, '&', PHP_QUERY_RFC3986) : '';
         } else {
             $arg = '';
-            while (list ($key, $val) = each ($params)) {
+            foreach ($parameters as $key => $val) {
                 $arg .= rawurlencode($key) . "=" . rawurlencode($val) . "&";
             }
             $query = substr($arg, 0, count($arg) - 2);
@@ -223,7 +223,7 @@ class OpenSearchClient extends OpenSearch {
     private function _filter($parameters = array()){
         $params = array();
         if(!empty($parameters)){
-            while (list ($key, $val) = each ($parameters)) {
+            foreach ($parameters as $key => $val) {
                 if ($key == "Signature" ||$val === "" || $val === NULL){
                     continue;
                 } else {
