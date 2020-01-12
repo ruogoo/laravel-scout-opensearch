@@ -13,6 +13,7 @@ require_once __DIR__ . '/../sdk/OpenSearch/Autoloader/Autoloader.php';
 
 use Illuminate\Config\Repository;
 use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Support\Arr;
 use Laravel\Scout\Builder;
 use Laravel\Scout\Engines\Engine;
 use OpenSearch\Client\DocumentClient;
@@ -31,15 +32,15 @@ class OpenSearchEngine extends Engine
 
     public function __construct(Repository $config)
     {
-        $accessKeyID     = $config->get('scout.opensearch.accessKeyID');
+        $accessKeyID = $config->get('scout.opensearch.accessKeyID');
         $accessKeySecret = $config->get('scout.opensearch.accessKeySecret');
-        $host            = $config->get('scout.opensearch.host');
-        $this->config    = $config;
+        $host = $config->get('scout.opensearch.host');
+        $this->config = $config;
 
         $this->client = new OpenSearchClient($accessKeyID, $accessKeySecret, $host);
 
         $this->documentClient = new DocumentClient($this->client);
-        $this->searchClient   = new SearchClient($this->client);
+        $this->searchClient = new SearchClient($this->client);
     }
 
     public function update($models)
@@ -65,24 +66,24 @@ class OpenSearchEngine extends Engine
     public function mapIds($results)
     {
         $result = $this->checkResults($results);
-        if (array_get($result, 'result.num', 0) === 0) {
+        if (Arr::get($result, 'result.num', 0) === 0) {
             return collect();
         }
 
         return collect(array_get($result, 'result.items'))->pluck('fields.id')->values();
     }
 
-    public function map($results, $model)
+    public function map(Builder $builder, $results, $model)
     {
         $result = $this->checkResults($results);
 
-        if (array_get($result, 'result.num', 0) === 0) {
+        if (Arr::get($result, 'result.num', 0) === 0) {
             return collect();
         }
-        $keys   = collect(array_get($result, 'result.items'))->pluck('fields.id')->values()->all();
+        $keys = collect(Arr::get($result, 'result.items'))->pluck('fields.id')->values()->all();
         $models = $model->whereIn($model->getQualifiedKeyName(), $keys)->get()->keyBy($model->getKeyName());
 
-        return collect(array_get($result, 'result.items'))->map(function ($item) use ($model, $models) {
+        return collect(Arr::get($result, 'result.items'))->map(function ($item) use ($model, $models) {
             $key = $item['fields']['id'];
 
             if (isset($models[$key])) {
@@ -95,19 +96,24 @@ class OpenSearchEngine extends Engine
     {
         $result = $this->checkResults($results);
 
-        return array_get($result, 'result.total', 0);
+        return Arr::get($result, 'result.total', 0);
+    }
+
+    public function flush($model)
+    {
+        // TODO: Implement flush() method.
     }
 
     /**
-     * @param \Illuminate\Database\Eloquent\Collection $models
-     * @param string                                   $cmd
+     * @param Collection $models
+     * @param string     $cmd
      */
     private function performDocumentsCommand($models, string $cmd)
     {
         if ($models->count() === 0) {
             return;
         }
-        $appName   = $models->first()->openSearchAppName();
+        $appName = $models->first()->openSearchAppName();
         $tableName = $models->first()->getTable();
 
         $docs = $models->map(function ($model) use ($cmd) {
